@@ -12,13 +12,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fahrulredho0018.assessment03.R
 import com.fahrulredho0018.assessment03.ui.theme.Assessment03Theme
 
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(){
-    Scaffold (
+fun MainScreen() {
+    Scaffold(
         topBar = {
             TopAppBar(
                 title = {
@@ -26,7 +29,7 @@ fun MainScreen(){
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor =  MaterialTheme.colorScheme.primary
+                    titleContentColor = MaterialTheme.colorScheme.primary
                 )
             )
         }
@@ -36,7 +39,9 @@ fun MainScreen(){
 }
 
 @Composable
-fun ScreenContent(modifier: Modifier = Modifier){
+fun ScreenContent(modifier: Modifier = Modifier) {
+    val viewModel: MainViewModel = viewModel()
+
     Text(
         text = "Hello Android!",
         modifier = modifier
