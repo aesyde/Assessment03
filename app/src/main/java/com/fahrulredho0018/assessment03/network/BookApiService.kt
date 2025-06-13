@@ -58,7 +58,6 @@ interface BookApiService {
 
     @DELETE("books/delete/{id}")
     suspend fun deleteBooks(
-        @Header("Authorization") userId: String,
         @Path("id") id: String
     ): OpStatus
 }

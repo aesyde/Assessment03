@@ -12,23 +12,31 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -48,12 +56,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -253,11 +263,8 @@ fun ListItem(book: Book, userId: String, onDeleteClick: () -> Unit = {}) {
     val contentResolver = context.contentResolver
 
     var showDialogEdit by remember { mutableStateOf(false) }
-    var bitmap by remember {
-        mutableStateOf<Bitmap?>(null)
-    }
+    var bitmap by remember { mutableStateOf<Bitmap?>(null) }
 
-    // Load awal dari URL
     val defaultBitmap = rememberBitmapFromUrl(BookApi.getBookUrl(book.image))
     if (bitmap == null && defaultBitmap != null) {
         bitmap = defaultBitmap
@@ -272,64 +279,124 @@ fun ListItem(book: Book, userId: String, onDeleteClick: () -> Unit = {}) {
         }
     }
 
-    Box(
+    Card(
         modifier = Modifier
-            .padding(4.dp)
-            .border(1.dp, Color.Gray),
-        contentAlignment = Alignment.BottomCenter
+            .padding(8.dp)
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(BookApi.getBookUrl(book.image))
-                .crossfade(true)
-                .build(),
-            contentDescription = stringResource(R.string.gambar, book.title),
-            contentScale = ContentScale.Crop,
-            placeholder = painterResource(id = R.drawable.loading_img),
-            error = painterResource(id = R.drawable.baseline_broken_image_24),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(4.dp)
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(4.dp)
-                .background(Color(0f, 0f, 0f, 0.2f))
-                .padding(4.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+        Column {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
             ) {
-                Column {
-                    Text(
-                        text = book.title,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                    Text(text = book.author, fontSize = 14.sp, color = Color.White)
-                    Text(text = book.publisher, fontSize = 14.sp, color = Color.White)
-                    Text(text = book.year, fontSize = 14.sp, color = Color.White)
-                }
+                AsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(BookApi.getBookUrl(book.image))
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = stringResource(R.string.gambar, book.title),
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(id = R.drawable.loading_img),
+                    error = painterResource(id = R.drawable.baseline_broken_image_24),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                )
+
                 if (userId.isNotEmpty()) {
-                    Row {
+                    Row(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp)
+                            .background(Color.Black.copy(alpha = 0.5f), shape = RoundedCornerShape(12.dp))
+                    ) {
                         IconButton(onClick = { showDialogEdit = true }) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
-                                contentDescription = stringResource(id = R.string.edit)
+                                contentDescription = stringResource(id = R.string.edit),
+                                tint = Color.White
                             )
                         }
                         IconButton(onClick = onDeleteClick) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
-                                contentDescription = stringResource(id = R.string.hapus)
+                                contentDescription = stringResource(id = R.string.hapus),
+                                tint = Color.White
                             )
                         }
                     }
                 }
+            }
 
+            // Informasi Buku
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Black.copy(alpha = 0.7f))
+                    .padding(12.dp)
+            ) {
+                Text(
+                    text = book.title,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 20.sp,
+                    color = Color.White,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = null,
+                        tint = Color.LightGray,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = book.author,
+                        fontSize = 14.sp,
+                        color = Color.LightGray
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painterResource(id = R.drawable.baseline_domain_24),
+                        contentDescription = null,
+                        tint = Color.LightGray,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = book.publisher,
+                        fontSize = 14.sp,
+                        color = Color.LightGray
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = null,
+                        tint = Color.LightGray,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = book.year,
+                        fontSize = 14.sp,
+                        color = Color.LightGray
+                    )
+                }
             }
         }
     }
@@ -372,7 +439,6 @@ fun ListItem(book: Book, userId: String, onDeleteClick: () -> Unit = {}) {
         )
     }
 }
-
 
 @Composable
 fun rememberBitmapFromUrl(url: String): Bitmap? {

@@ -110,9 +110,7 @@ class MainViewModel : ViewModel() {
     fun deleteBook(userId: String, id: String) {
         viewModelScope.launch {
             try {
-                val result = BookApi.service.deleteBooks(
-                    userId, id
-                )
+                val result = BookApi.service.deleteBooks(id)
 
                 if (result.status == "success") {
                     retrieveData(userId)
